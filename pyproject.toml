@@ -1,0 +1,18 @@
+[project]
+name = "jumpcoach-ml"
+version = "0.1.0"
+description = "JumpCoach ML/CV pipeline (pose extraction, baseline, comparison)"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "opencv-python",
+  "mediapipe",
+  "pytest",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
