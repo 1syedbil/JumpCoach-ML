@@ -1,6 +1,6 @@
 HOW TO SETUP PROJECT DIRECTORY:
 
-**YOU MUST INSTALL PYTHON 3.11.9
+*****YOU MUST INSTALL PYTHON 3.11.9*****
 Run the commands in PowerShell or command prompt inside the root directory
 
 Step 1. Clone the repo
