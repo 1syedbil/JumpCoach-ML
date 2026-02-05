@@ -1,9 +1,9 @@
 MAIN LIBRARIES
 
-OpenCV     --- breaking down the uploaded optimal shooting form into frames
-MediaPipe  --- analyzes the frames, extracts the positions of the different joins
-NumPy      --- calculate angles of joint + stabilize/normalize the values of joint positions
-SciPy      --- calculate angles of joint + stabilize/normalize the values of joint positions
+OpenCV     --- breaking down the uploaded optimal shooting form into frames <br>
+MediaPipe  --- analyzes the frames, extracts the positions of the different joins <br>
+NumPy      --- calculate angles of joint + stabilize/normalize the values of joint positions <br>
+SciPy      --- calculate angles of joint + stabilize/normalize the values of joint positions <br>
 
 *********************************************************************************************************************************************************
 
