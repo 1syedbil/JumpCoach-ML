@@ -1,6 +1,6 @@
 HOW TO SETUP PROJECT DIRECTORY:
 
-**INSTALL PYTHON 3.11.9
+**YOU MUST INSTALL PYTHON 3.11.9
 Run the commands in PowerShell or command prompt
 
 Step 1. Clone the repo
@@ -11,9 +11,12 @@ Step 2. Go to the main folder of the project one cloned
 Command: cd jumpcoach-ml
 
 
-Step 3. Setup virtual environment
+Step 3. Setup and then run virtual environment
 
+*create environment
 Command: py -3.11 -m venv .venv
+
+*start environment
 Command: .\.venv\Scripts\Activate.ps1
 
 
@@ -29,3 +32,8 @@ Command: pip install -e .
 Step 6. Verify setup succeeded. The following command will print "Ready" if it succeeds
 
 Command: python -c "import jumpcoach_ml; print('Ready')"
+
+
+Step 7. Always run/test the program in the virtual environment because that's where you install the dependencies.
+
+Command: .\.venv\Scripts\Activate.ps1
