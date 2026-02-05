@@ -6,9 +6,7 @@ Run the commands in PowerShell or command prompt inside the root directory
 Step 1. Clone the repo
 
 
-Step 2. Go to the main folder of the cloned project
-
-Command: cd jumpcoach-ml
+Step 2. Go to the main folder of the cloned project in command prompt/PowerShell
 
 
 Step 3. Setup and then run virtual environment
