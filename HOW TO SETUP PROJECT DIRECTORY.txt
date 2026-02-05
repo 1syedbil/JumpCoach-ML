@@ -1,7 +1,7 @@
 HOW TO SETUP PROJECT DIRECTORY:
 
 **YOU MUST INSTALL PYTHON 3.11.9
-Run the commands in PowerShell or command prompt
+Run the commands in PowerShell or command prompt inside the root directory
 
 Step 1. Clone the repo
 
@@ -21,6 +21,7 @@ Command: .\.venv\Scripts\Activate.ps1
 
 
 Step 4. Setup pip
+
 Command: python -m pip install --upgrade pip setuptools wheel
 
 
