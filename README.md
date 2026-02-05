@@ -46,9 +46,11 @@ Step 7. Always run/test the program in the virtual environment because that's wh
 
 Command: .\.venv\Scripts\Activate.ps1
 
+**********************************************************************************************************************
 
 
 <img width="543" height="700" alt="AnalyzeUploadedVidFlowChart" src="https://github.com/user-attachments/assets/0d9fca3b-73be-4335-916b-320782eeac0b" />
+
 
 
 
