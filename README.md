@@ -9,42 +9,41 @@ SciPy      --- calculate angles of joint + stabilize/normalize the values of joi
 
 HOW TO SETUP PROJECT DIRECTORY:
 
-*****YOU MUST INSTALL PYTHON 3.11.9*****
-Run the commands in PowerShell or command prompt inside the root directory
+*****YOU MUST INSTALL PYTHON 3.11.9 AND RUN ALL COMMANDS IN POWERSHELL INSIDE THE ROOT DIRECTORY*****
 
 Step 1. Clone the repo
 
 
-Step 2. Go to the main folder of the cloned project in command prompt/PowerShell
+Step 2. Go to the root directory of the cloned project in PowerShell
 
 
 Step 3. Setup and then run virtual environment
 
 *create environment
-Command: py -3.11 -m venv .venv
+Command: `py -3.11 -m venv .venv`
 
 *start environment
-Command: .\.venv\Scripts\Activate.ps1
+Command: `.\.venv\Scripts\Activate.ps1`
 
 
 Step 4. Setup pip
 
-Command: python -m pip install --upgrade pip setuptools wheel
+Command: `python -m pip install --upgrade pip setuptools wheel`
 
 
 Step 5. Install all dependencies
 
-Command: pip install -e .
+Command: `pip install -e .`
 
 
 Step 6. Verify setup succeeded. The following command will print "Ready" if it succeeds
 
-Command: python -c "import jumpcoach_ml; print('Ready')"
+Command: `python -c "import jumpcoach_ml; print('Ready')"`
 
 
 Step 7. Always run/test the program in the virtual environment because that's where you install the dependencies.
 
-Command: .\.venv\Scripts\Activate.ps1
+Command: `.\.venv\Scripts\Activate.ps1`
 
 **********************************************************************************************************************
 
