@@ -1,52 +1,66 @@
 """
 OVERVIEW:
-This file serves as the command-line entry point for User Story 1. It is responsible
+This file serves as the command-line entry point for User Story 1
+. It is responsible 
 for invoking the baseline creation method defined in baseline.py, which connects and
 coordinates all underlying modules involved in building the baseline shooting form model.
 
 SCOPE:
-This file contains no machine learning or computer vision logic; it exists only to run
-the baseline pipeline and handle basic input/output concerns. Outputs the baseline model
-artifact.
+This file contains no machine learning or computer vision logic; it exists
+ only to run the baseline pipeline and handle basic input/output concerns.
+Outputs the baseline model artifact.
 """
 
-# 1. Import standard libraries for:
-#    - parsing command-line arguments
-#    - reading/writing JSON
-#    - handling file paths
+import argparse
+import json
+import sys
+from pathlib import Path
 
-# 2. Import the build_baseline() method from baseline.py
-#    This method is responsible for coordinating all ML/CV modules.
+# Add parent directory to path so Python can find src module
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.jumpcoach_ml.pipeline.baseline import build_baseline
 
 
 def main():
-    # 3. Parse command-line arguments:
-    #    - path to the uploaded optimal free-throw video
-
-    # 4. Validate that the input video path exists and is accessible.
-
-    # 5. Call the build_baseline() method defined in baseline.py,
-    #    passing in:
-    #      - the video file path
-    #      - any configuration values required for processing
-    #
-    #    The pipeline method will:
-    #      - extract frames from the video
-    #      - run pose inference
-    #      - normalize and stabilize pose data
-    #      - compute shooting-form features
-    #      - assemble a baseline model artifact
-
-    # 6. Receive the baseline model artifact returned by the pipeline.
-    #    This artifact should be a JSON-serializable Python structure.
-
-    # 7. Write the baseline model artifact to a JSON file at the specified
-    #    output location.
-
-    # 8. Print basic success/failure information to the console
-    #    to confirm the pipeline completed.
-
-    pass
+    # Parse command-line arguments with 2 required parameters:
+    # 1. video_path: path to the input video file
+    # 2. output: path to the output JSON file (optional, default: baseline_model.json)
+    
+    parser = argparse.ArgumentParser(description="Build a baseline shooting form model from a video")
+    parser.add_argument("video_path", help="Path to the video file")
+    parser.add_argument("--output", default="baseline_model.json", help="Output JSON file path")
+    
+    args = parser.parse_args()
+    
+    # Check if the video file exists
+    video_file = Path(args.video_path)
+    if not video_file.exists():
+        print(f"Error: Video file not found: {args.video_path}")
+        return
+    
+    print(f"Processing video: {args.video_path}")
+    
+    # Create default configuration { you can expand / customize this as needed }
+    config = {
+        "fps": 30,
+        "resize": True,
+        "confidence_threshold": 0.5
+    }
+    
+    # Runing the baseline pipeline here with try-catch 
+    try:
+        baseline_model = build_baseline(str(video_file), config)
+        
+        # Save the result to a JSON file
+        output_file = Path(args.output)
+        with open(output_file, "w") as f:
+            json.dump(baseline_model, f, indent=2)
+        
+        print(f"Success, Baseline model saved to: {args.output}")
+        
+    except Exception as e:
+        print(f"Error processing video: {e}")
 
 
 if __name__ == "__main__":
