@@ -27,10 +27,11 @@ LIBRARIES USED:
 """
 import cv2, time, os
 
-def get_frames(video_path):
+def get_frames(video_path, config):
   #resize and fix fps
   #video_path = "testVideos\IMG_1350.mov"
-  os.system("ffmpeg -i "+video_path+" -r 30 -vf scale=640:-2 output_30fps.mp4 -loglevel quiet -y")
+  target_fps = str(config.get("fps"))
+  os.system("ffmpeg -i "+video_path+" -r "+target_fps+" -vf scale=640:-2 output_30fps.mp4 -loglevel quiet -y")
   video_path = "output_30fps.mp4"
 
   # max allow 10 min videos
@@ -41,13 +42,13 @@ def get_frames(video_path):
 
   #read video and attach timestamps
   while cap.isOpened():
-      time_stamp = time.time()
 
       success, frame = cap.read()
       if not success:
           break
-    
-      frame_dict[time_stamp] = frame.copy()
+      
+      timestamp_ms = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+      frame_dict[timestamp_ms] = frame.copy()
 
       if len(frame_dict) >= MAX_FRAMES:
           #video too long

@@ -51,16 +51,18 @@ def build_baseline(video_path, config):
             "Make sure frames.py defines get_frames(video_path)."
         ) from e
 
-    frame_dict = get_frames(str(video_file))  # returns {timestamp: frame}
+    frame_dict = get_frames(str(video_file), config)  # returns {timestamp: frame}
 
     # Convert dict -> ordered list of frame records
-    ordered_timestamps = sorted(frame_dict.keys())
+    
+    # The frame_dict is sorted in get_frames()
+    # ordered_timestamps = sorted(frame_dict.keys())
     frames: List[Dict[str, Any]] = [
         {
-            "timestamp_sec": float(ts),
+            "timestamp_ms": float(ts),
             "image_bgr": frame_dict[ts],
         }
-        for ts in ordered_timestamps
+        for ts in frame_dict
     ]
 
     # ------------------------------------------------------------------
