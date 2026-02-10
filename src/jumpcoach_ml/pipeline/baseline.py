@@ -21,81 +21,130 @@ or computer vision logic itself.
 #    - dataclasses (optional)
 #    - path handling
 
-# 2. Import the lower-level pipeline modules:
-#    - video frame extraction module (frames.py)
-#    - pose inference module (mediapipe_pose.py)
-#    - pose normalization/stabilization module (pose_cleaning.py)
-#    - feature extraction module (angles.py)
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any, Dict, List
+import time
 
 
 def build_baseline(video_path, config):
-    """
-    Orchestrates the full baseline-building workflow.
 
-    Input:
-    - video_path: path to the uploaded optimal free-throw video
-    - config: configuration parameters controlling FPS, resizing, thresholds, etc.
+    start_ts = time.time()
+    video_file = Path(video_path)
 
-    Output:
-    - baseline model artifact (JSON-serializable structure)
-    """
+    if not video_file.exists():
+        raise FileNotFoundError(f"Video file not found: {video_file}")
 
-    # ------------------------------------------------------------------
-    # Stage 1: Video → Frames (invokes frames.py module)
-    # ------------------------------------------------------------------
-    # 3. Pass the input video file path to the frame extraction module.
-    #    The module should:
-    #      - open the video
-    #      - sample frames at a fixed FPS
-    #      - optionally resize frames
-    #      - attach timestamps/frame indices
-    #
-    #    Output: ordered list of video frames.
+    # Config values are currently not used by frames.py because it hardcodes
+    # FPS/resize via ffmpeg internally. Keeping these reads is harmless for now. :contentReference[oaicite:3]{index=3}
+    confidence_threshold = float(config.get("confidence_threshold", 0.5))
 
     # ------------------------------------------------------------------
-    # Stage 2: Frames → Pose Landmarks (invokes mediapipe_pose.py module)
+    # Stage 1: Video → Frames (frames.py)
     # ------------------------------------------------------------------
-    # 4. Pass the extracted frames to the pose inference module.
-    #    The module should:
-    #      - run pose estimation on each frame
-    #      - extract body landmark coordinates and confidence values
-    #      - flag invalid frames based on confidence thresholds
-    #
-    #    Output: ordered list of pose frames with landmarks and metadata.
+    try:
+        from jumpcoach_ml.video.frames import get_frames
+    except Exception as e:
+        raise ImportError(
+            "Could not import get_frames from jumpcoach_ml.video.frames. "
+            "Make sure frames.py defines get_frames(video_path)."
+        ) from e
+
+    frame_dict = get_frames(str(video_file))  # returns {timestamp: frame}
+
+    # Convert dict -> ordered list of frame records
+    ordered_timestamps = sorted(frame_dict.keys())
+    frames: List[Dict[str, Any]] = [
+        {
+            "timestamp_sec": float(ts),
+            "image_bgr": frame_dict[ts],
+        }
+        for ts in ordered_timestamps
+    ]
 
     # ------------------------------------------------------------------
-    # Stage 3: Pose Normalization & Stabilization (invokes pose_cleaning.py module)
+    # Stage 2: Frames → Pose Landmarks (mediapipe_pose.py)
     # ------------------------------------------------------------------
-    # 5. Pass the raw pose landmark sequence to the pose cleaning module.
-    #    The module should:
-    #      - normalize coordinates (translation, scale, etc.)
-    #      - stabilize landmark trajectories across time
-    #      - preserve timestamps and frame ordering
-    #
-    #    Output: cleaned pose landmark sequence.
+    # infer_pose_sequence should iterate frames in order. We now provide that order.
+    try:
+        from jumpcoach_ml.pose.mediapipe_pose import infer_pose_sequence
+    except Exception as e:
+        raise ImportError(
+            "Could not import infer_pose_sequence from jumpcoach_ml.pose.mediapipe_pose. "
+            "Make sure mediapipe_pose.py defines infer_pose_sequence(frames, confidence_threshold)."
+        ) from e
+
+    pose_frames = infer_pose_sequence(
+        frames=frames,
+        confidence_threshold=confidence_threshold
+    )
 
     # ------------------------------------------------------------------
-    # Stage 4: Feature Extraction (invokes angles.py module)
+    # Stage 3: Pose Normalization & Stabilization (pose_cleaning.py)
     # ------------------------------------------------------------------
-    # 6. Pass the cleaned pose data to the feature extraction module.
-    #    The module should:
-    #      - compute biomechanical shooting-form attributes
-    #        (e.g., joint angles, alignment metrics)
-    #      - return per-feature time series aligned to the pose frames
-    #
-    #    Output: dictionary mapping feature names to numerical sequences.
+    try:
+        from jumpcoach_ml.preprocessing.pose_cleaning import clean_pose_sequence
+    except Exception as e:
+        raise ImportError(
+            "Could not import clean_pose_sequence from jumpcoach_ml.preprocessing.pose_cleaning. "
+            "Make sure pose_cleaning.py defines clean_pose_sequence(pose_frames)."
+        ) from e
+
+    cleaned_pose_frames = clean_pose_sequence(pose_frames=pose_frames)
 
     # ------------------------------------------------------------------
-    # Stage 5: Baseline Model Assembly
+    # Stage 4: Feature Extraction (angles.py)
     # ------------------------------------------------------------------
-    # 7. Assemble the baseline model artifact by combining:
-    #      - metadata about the input video and processing parameters
-    #      - extracted feature time series
-    #      - optional timestamps and feature lists
-    #
-    #    This artifact represents the baseline shooting form model.
+    try:
+        from jumpcoach_ml.features.angles import compute_angle_features
+    except Exception as e:
+        raise ImportError(
+            "Could not import compute_angle_features from jumpcoach_ml.features.angles. "
+            "Make sure angles.py defines compute_angle_features(pose_frames)."
+        ) from e
 
-    # 8. Ensure the artifact is JSON-serializable and return it to the caller.
+    feature_series = compute_angle_features(pose_frames=cleaned_pose_frames)
 
+    # ------------------------------------------------------------------
+    # Stage 5: Baseline Model Assembly (still TBD)
+    # ------------------------------------------------------------------
+    artifact: Dict[str, Any] = {
+        "metadata": {
+            "pipeline_version": "v1",
+            "video_filename": video_file.name,
+            "created_unix_ts": int(time.time()),
+            "runtime_sec": round(time.time() - start_ts, 4),
+        },
+        "baseline": {
+            "status": "TBD",
+            "notes": "Baseline model artifact schema not finalized yet.",
+            "feature_series": None,
+            "timestamps_sec": None,
+        },
+    }
 
-    pass 
+    # JSON sanitization (inline)
+    try:
+        import numpy as np
+
+        def sanitize(obj):
+            if isinstance(obj, dict):
+                return {str(k): sanitize(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [sanitize(v) for v in obj]
+            if isinstance(obj, tuple):
+                return [sanitize(v) for v in obj]
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            if isinstance(obj, (np.float32, np.float64)):
+                return float(obj)
+            if isinstance(obj, (np.int32, np.int64)):
+                return int(obj)
+            return obj
+
+        artifact = sanitize(artifact)
+    except ImportError:
+        pass
+
+    return artifact

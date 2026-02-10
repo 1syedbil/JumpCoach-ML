@@ -29,7 +29,7 @@ import cv2, time, os
 
 def get_frames(video_path):
   #resize and fix fps
-  video_path = "testVideos\IMG_1350.mov"
+  #video_path = "testVideos\IMG_1350.mov"
   os.system("ffmpeg -i "+video_path+" -r 30 -vf scale=640:-2 output_30fps.mp4 -loglevel quiet -y")
   video_path = "output_30fps.mp4"
 
