@@ -59,10 +59,10 @@ def build_baseline(video_path, config):
     # ordered_timestamps = sorted(frame_dict.keys())
     frames: List[Dict[str, Any]] = [
         {
-            "timestamp_ms": float(ts),
-            "image_bgr": frame_dict[ts],
+            "timestamp_ms": int(tms),
+            "image_bgr": frame_dict[tms],
         }
-        for ts in frame_dict
+        for tms in frame_dict
     ]
 
     # ------------------------------------------------------------------
